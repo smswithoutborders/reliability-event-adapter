@@ -1,111 +1,77 @@
-# Platform Adapter Template
+# Reliability Event Adapter
 
-## Overview
+This adapter provides a pluggable implementation for testing the reliability of gateway-clients. It is designed to work with [RelaySMS Publisher](https://github.com/smswithoutborders/RelaySMS-Publisher).
 
-This template provides a standardized foundation for developing platform-specific adapters.
+## Requirements
 
----
+- **Python**: Version >=
+  [3.8.10](https://www.python.org/downloads/release/python-3810/)
+- **Python Virtual Environments**:
+  [Documentation](https://docs.python.org/3/tutorial/venv.html)
 
-## Directory Structure
+## Dependencies
 
-The template includes the following files:
+### On Ubuntu
 
-| File                     | Description                                                                                                                              |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `adapter.py`             | Core implementation of the platform-specific adapter. Developers subclass a protocol interface and define required methods here.         |
-| `protocol_interfaces.py` | Abstract base classes that define the protocol contracts (e.g., `OAuth2ProtocolInterface`). Adapters must implement these.               |
-| `ipc_service.py`         | Manages IPC between the host program and the adapter. It routes incoming requests to the appropriate adapter method and returns results. |
-| `main.py`                | Adapter entry point. It initializes the adapter and starts the IPC listener.                                                             |
-| `manifest.ini`           | Describes the adapter with metadata such as its name, shortcode, protocol, and service type.                                             |
-| `config.ini`             | Contains adapter configuration, including paths to credential files.                                                                     |
-| `credentials.json`       | Stores authentication credentials (e.g., client ID/secret for OAuth2), referenced by `config.ini`.                                       |
-| `requirements.txt`       | Lists Python dependencies required to run the adapter.                                                                                   |
+Install the necessary system packages:
 
----
-
-## Quick Start
-
-### Step 1: Implement the Adapter
-
-> [!WARNING]
->
-> Avoid modifying `protocol_interfaces.py` or `ipc_service.py` unless necessary. Changes may cause incompatibilities with the host system.
-
-1. Open `adapter.py`.
-2. Identify and subclass the correct protocol interface from `protocol_interfaces.py`.
-   Example: For OAuth2-based platforms, use `OAuth2ProtocolInterface`.
-3. Implement all required abstract methods. Common methods for OAuth2 include:
-
-```python
-class GmailOAuth2Adapter(OAuth2ProtocolInterface):
-    def get_authorization_url(self, **kwargs) -> Dict[str, Any]:
-        # Return a URL for user authorization.
-
-    def get_access_token(self, code: str, **kwargs) -> Dict[str, Any]:
-        # Exchange auth code for access token.
-
-    def get_user_info(self, **kwargs) -> Dict[str, Any]:
-        # Return user profile or account metadata.
-
-    def revoke_token(self, **kwargs) -> bool:
-        # Invalidate the access token.
-
-    def send_message(self, message: str, **kwargs) -> bool:
-        # Send a message using the platform's API.
+```bash
+sudo apt install build-essential python3-dev
 ```
 
-### Step 2: Configure Adapter Metadata
+## Installation
 
-Edit the following configuration files:
+1. **Create a virtual environment:**
 
-#### `manifest.ini`
+   ```bash
+   python3 -m venv venv
+   ```
 
-Defines core metadata about the adapter.
+2. **Activate the virtual environment:**
 
-```ini
-[platform]
-name = gmail
-shortcode = g
-protocol = oauth2
-service_type = email
-icon_svg = https://raw.githubusercontent.com/smswithoutborders/gmail-oauth2-adapter/main/icons/gmail.svg
-icon_png = https://raw.githubusercontent.com/smswithoutborders/gmail-oauth2-adapter/main/icons/gmail.png
-support_url_scheme = false
-```
+   ```bash
+   . venv/bin/activate
+   ```
 
-#### `config.ini`
+3. **Install the required Python packages:**
 
-Points to authentication credentials and defines asset directories.
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Configuration
+
+1. Configure the database credentials in a `credentials.json` file:
+2. Set the path to your credentials file in `config.ini`:
 
 ```ini
 [credentials]
-path = ./credentials.json
+path=./credentials.json
 ```
 
-> [!NOTE]
->
-> - Ensure `credentials.json` exists and contains valid keys, secrets, or tokens per your platform’s requirements.
+**Sample `credentials.json` for MySQL:**
 
----
-
-## Running & Testing the Adapter
-
-You can test the adapter using standard IPC messages sent through stdin:
-
-```bash
-echo '{"method": "get_authorization_url", "params": {"autogenerate_code_verifier": true}}' | python3 main.py
+```json
+{
+  "engine": "mysql",
+  "mysql": {
+    "host": "localhost",
+    "user": "username",
+    "password": "password",
+    "database": "reliability_test"
+  }
+}
 ```
 
-> [!NOTE]
->
-> Replace `get_authorization_url` with other supported methods (`get_access_token`, `send_message`, etc.), and update `params` accordingly.
+**Sample `credentials.json` for SQLite:**
 
----
-
-## Keeping Interfaces Up to Date
-
-If you suspect that `protocol_interfaces.py` is outdated or inconsistent with the host platform, sync it using:
-
-```bash
-curl -o protocol_interfaces.py https://raw.githubusercontent.com/smswithoutborders/RelaySMS-Publisher/feat/plugable-platforms/platforms/protocol_interfaces.py
+```json
+{
+  "engine": "sqlite",
+  "sqlite": {
+    "database_path": "./reliability_test.db"
+  }
+}
 ```
+
+> If no credentials are specified, the adapter will default to SQLite with a database file at `./reliability_test.db`
