@@ -28,21 +28,30 @@ def load_credentials(configs):
             "engine": "sqlite",
             "sqlite": {"database_path": "./reliability_test.db"},
         }
+        return credentials
+
     if not os.path.isabs(creds_path):
         creds_path = os.path.join(os.path.dirname(__file__), creds_path)
 
     with open(creds_path, encoding="utf-8") as f:
         creds = json.load(f)
 
+    def get_env_value(value):
+        """Get value from environment if it starts with $"""
+        if isinstance(value, str) and value.startswith("$"):
+            env_var = value[1:]
+            return os.environ.get(env_var, value)
+        return value
+
     if creds.get("engine") == "mysql":
         mysql_config = creds.get("mysql", {})
         credentials = {
             "engine": "mysql",
             "mysql": {
-                "host": mysql_config.get("host", ""),
-                "user": mysql_config.get("user", ""),
-                "password": mysql_config.get("password", ""),
-                "database": mysql_config.get("database", ""),
+                "host": get_env_value(mysql_config.get("host", "")),
+                "user": get_env_value(mysql_config.get("user", "")),
+                "password": get_env_value(mysql_config.get("password", "")),
+                "database": get_env_value(mysql_config.get("database", "")),
             },
         }
     elif creds.get("engine") == "sqlite":
@@ -50,7 +59,7 @@ def load_credentials(configs):
         credentials = {
             "engine": "sqlite",
             "sqlite": {
-                "database_path": sqlite_config.get("database_path", ""),
+                "database_path": get_env_value(sqlite_config.get("database_path", "")),
             },
         }
     else:
