@@ -7,12 +7,12 @@ Public License was not distributed with this file, see <https://www.gnu.org/lice
 from peewee import Database, DatabaseError, MySQLDatabase, SqliteDatabase
 from playhouse.shortcuts import ReconnectMixin
 from utils import ensure_database_exists, load_credentials
-from adapter import ReliabilityEventAdapter
+from protocol_interfaces import BaseProtocolInterface
 from logutils import get_logger
 
 logger = get_logger(__name__)
 
-DATABASE_CONFIGS = load_credentials(ReliabilityEventAdapter.config)
+DATABASE_CONFIGS = load_credentials(BaseProtocolInterface.config)
 
 
 class ReconnectMySQLDatabase(ReconnectMixin, MySQLDatabase):
