@@ -12,7 +12,7 @@ from logutils import get_logger
 
 logger = get_logger(__name__)
 
-DATABASE_CONFIGS = load_credentials(BaseProtocolInterface.config)
+DATABASE_CONFIGS = load_credentials(BaseProtocolInterface().config)
 
 
 class ReconnectMySQLDatabase(ReconnectMixin, MySQLDatabase):
