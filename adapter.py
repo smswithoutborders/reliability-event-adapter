@@ -58,10 +58,10 @@ class ReliabilityEventAdapter(EventProtocolInterface):
                         f"marked as '{test_record.status}'.",
                     }
                 test_record.sms_sent_time = datetime.fromtimestamp(
-                    int(sms_sent_timestamp) / 1000
+                    int(sms_sent_timestamp)
                 )
                 test_record.sms_received_time = datetime.fromtimestamp(
-                    int(sms_received_timestamp) / 1000
+                    int(sms_received_timestamp)
                 )
                 test_record.sms_routed_time = datetime.now()
                 test_record.status = "success"
