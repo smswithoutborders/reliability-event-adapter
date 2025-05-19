@@ -27,6 +27,7 @@ def load_credentials(configs):
         credentials = {
             "engine": "sqlite",
             "sqlite": {"database_path": "./reliability_test.db"},
+            "mysql": {"host": "", "user": "", "password": "", "database": ""},
         }
         return credentials
 
@@ -53,6 +54,7 @@ def load_credentials(configs):
                 "password": get_env_value(mysql_config.get("password", "")),
                 "database": get_env_value(mysql_config.get("database", "")),
             },
+            "sqlite": {"database_path": ""},
         }
     elif creds.get("engine") == "sqlite":
         sqlite_config = creds.get("sqlite", {})
@@ -61,6 +63,7 @@ def load_credentials(configs):
             "sqlite": {
                 "database_path": get_env_value(sqlite_config.get("database_path", "")),
             },
+            "mysql": {"host": "", "user": "", "password": "", "database": ""},
         }
     else:
         logger.warning(
@@ -70,6 +73,7 @@ def load_credentials(configs):
         credentials = {
             "engine": "sqlite",
             "sqlite": {"database_path": "./reliability_test.db"},
+            "mysql": {"host": "", "user": "", "password": "", "database": ""},
         }
     return credentials
 
