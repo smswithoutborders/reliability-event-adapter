@@ -24,7 +24,21 @@ class ReliabilityEventAdapter(EventProtocolInterface):
     def update(self, resource_id, **kwargs):
         sms_sent_timestamp = kwargs["sms_sent_timestamp"]
         sms_received_timestamp = kwargs["sms_received_timestamp"]
-        sms_routed_timestamp = kwargs["sms_routed_timestamp"]
+
+        if not sms_sent_timestamp:
+            error_message = "sms_sent_timestamp is required."
+            logger.error(error_message)
+            return {
+                "success": False,
+                "message": error_message,
+            }
+        if not sms_received_timestamp:
+            error_message = "sms_received_timestamp is required."
+            logger.error(error_message)
+            return {
+                "success": False,
+                "message": error_message,
+            }
 
         try:
             self._timeout_tests()
@@ -43,9 +57,13 @@ class ReliabilityEventAdapter(EventProtocolInterface):
                         "message": f"Test ID {resource_id} is already "
                         f"marked as '{test_record.status}'.",
                     }
-                test_record.sms_sent_time = sms_sent_timestamp
-                test_record.sms_received_time = sms_received_timestamp
-                test_record.sms_routed_time = sms_routed_timestamp
+                test_record.sms_sent_time = datetime.fromtimestamp(
+                    int(sms_sent_timestamp) / 1000
+                )
+                test_record.sms_received_time = datetime.fromtimestamp(
+                    int(sms_received_timestamp) / 1000
+                )
+                test_record.sms_routed_time = datetime.now()
                 test_record.status = "success"
                 test_record.save()
 
